@@ -1,9 +1,9 @@
-﻿using Assets._Project.Develop.Runtime.Infrastructure.DI;
+﻿using Assets._Project.Develop.Runtime.Gameplay.Core;
+using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
 using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
 using Assets.Develop.Runtime.Gameplay.Core;
-using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 {
@@ -21,6 +21,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
                 c.Resolve<PlayerInputService>(),
                 c.Resolve<SceneSwitcherService>(),
                 c.Resolve<ICoroutinesPerformer>(),
+                c.Resolve<GameProgressService>(),
                 args.Mode));
         }
     }

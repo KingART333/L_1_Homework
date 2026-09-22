@@ -1,14 +1,11 @@
 ﻿using Assets._Project.Develop.Runtime.Gameplay.Infrastructure;
+using Assets._Project.Develop.Runtime.Infrastructure;
 using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Assets.Develop.Runtime.Gameplay.Core;
 using UnityEngine;
 
-namespace Assets.Develop.Runtime.Gameplay.Core
+namespace Assets._Project.Develop.Runtime.Gameplay.Core
 {
     public class GameplayLoopService
     {
@@ -16,6 +13,7 @@ namespace Assets.Develop.Runtime.Gameplay.Core
         private readonly PlayerInputService _playerInput;
         private readonly SceneSwitcherService _sceneSwitcherService;
         private readonly ICoroutinesPerformer _coroutinesPerformer;
+        private readonly GameProgressService _progressService;
         private readonly GameMode _mode;
 
         private SequenceCheckerService _sequenceChecker;
@@ -26,12 +24,14 @@ namespace Assets.Develop.Runtime.Gameplay.Core
             PlayerInputService playerInput,
             SceneSwitcherService sceneSwitcherService,
             ICoroutinesPerformer coroutinesPerformer,
+            GameProgressService progressService,
             GameMode mode)
         {
             _sequenceGenerator = sequenceGenerator;
             _playerInput = playerInput;
             _sceneSwitcherService = sceneSwitcherService;
             _coroutinesPerformer = coroutinesPerformer;
+            _progressService = progressService;
             _mode = mode;
         }
 
@@ -79,12 +79,14 @@ namespace Assets.Develop.Runtime.Gameplay.Core
                     break;
 
                 case SequenceCheckResult.Failed:
+                    _progressService.RegisterLoss();
                     Debug.Log("Lose! Press space for restart");
                     _state = GameplayState.Lose;
                     break;
 
                 case SequenceCheckResult.Completed:
-                    Debug.Log("Win! Press space for Main Menu");
+                    _progressService.RegisterWin();
+                    Debug.Log("Win! Press Space for main menu");
                     _state = GameplayState.Win;
                     break;
             }

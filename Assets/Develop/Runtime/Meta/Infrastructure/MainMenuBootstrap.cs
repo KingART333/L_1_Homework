@@ -1,4 +1,5 @@
-﻿using Assets._Project.Develop.Runtime.Gameplay.Infrastructure;
+﻿using Assets._Project.Develop.Runtime.Gameplay.Core;
+using Assets._Project.Develop.Runtime.Gameplay.Infrastructure;
 using Assets._Project.Develop.Runtime.Infrastructure;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
@@ -28,11 +29,10 @@ namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
             yield break;
         }
 
-
         public override void Run()
         {
             Debug.Log("Start gameplay Menu");
-            Debug.Log("Press 1 — digits mode, 2 — letters mode");
+            Debug.Log("Press 1 — Digits, 2 — Letters, P — Statistics, R — Reset progress");
         }
 
         private void Update()
@@ -44,6 +44,10 @@ namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
                 SwitchToGameplay(GameMode.Digits);
             else if (Input.GetKeyDown(KeyCode.Alpha2))
                 SwitchToGameplay(GameMode.Letters);
+            else if (Input.GetKeyDown(KeyCode.P))
+                PrintStatus();
+            else if (Input.GetKeyDown(KeyCode.R))
+                ResetProgress();
         }
 
         private void SwitchToGameplay(GameMode mode)
@@ -54,6 +58,22 @@ namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
             ICoroutinesPerformer coroutinesPerformer = _container.Resolve<ICoroutinesPerformer>();
 
             coroutinesPerformer.StartPerform(sceneSwitcherService.ProcessSwitchTo(Scenes.Gameplay, new GameplayInputArgs(mode)));
+        }
+
+        private void PrintStatus()
+        {
+            GameProgressService progressService = _container.Resolve<GameProgressService>();
+            progressService.PrintStatus();
+        }
+
+        private void ResetProgress()
+        {
+            GameProgressService progressService = _container.Resolve<GameProgressService>();
+
+            if (progressService.TryResetProgress())
+                Debug.Log("Progress reseted");
+            else
+                Debug.Log("Insufisent funds for reseting progress");
         }
     }
 }
