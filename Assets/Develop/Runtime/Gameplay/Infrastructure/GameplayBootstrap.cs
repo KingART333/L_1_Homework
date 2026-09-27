@@ -1,4 +1,4 @@
-﻿using Assets._Project.Develop.Runtime.Infrastructure;
+using Assets._Project.Develop.Runtime.Infrastructure;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
@@ -6,7 +6,6 @@ using Assets._Project.Develop.Runtime.Gameplay.Core;
 using System;
 using System.Collections;
 using UnityEngine;
-
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 {
@@ -30,7 +29,7 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 
         public override IEnumerator Initialize()
         {
-            Debug.Log($"Mode: {_inputArgs.Mode}");
+            Debug.Log($"Chosen mode: {_inputArgs.Mode}");
 
             Debug.Log("Initialization gameplay scene");
 
@@ -38,7 +37,6 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Infrastructure
 
             yield break;
         }
-
 
         public override void Run()
         {

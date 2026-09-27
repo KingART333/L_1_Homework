@@ -1,4 +1,4 @@
-﻿using Assets._Project.Develop.Runtime.Utilities.DataManagement;
+using Assets._Project.Develop.Runtime.Utilities.DataManagement;
 using Assets._Project.Develop.Runtime.Utilities.DataManagement.DataProviders;
 
 namespace Assets._Project.Develop.Runtime.Meta.Features.Statistics
@@ -21,7 +21,7 @@ namespace Assets._Project.Develop.Runtime.Meta.Features.Statistics
 
         public void RegisterLoss() => _lossesCount++;
 
-        public void ResetProgress()
+        public void ResetStatistics()
         {
             _winsCount = 0;
             _lossesCount = 0;

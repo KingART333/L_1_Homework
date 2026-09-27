@@ -1,5 +1,6 @@
-﻿using Assets._Project.Develop.Runtime.Gameplay.Core;
+using Assets._Project.Develop.Runtime.Gameplay.Core;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
+using Assets._Project.Develop.Runtime.Meta.Features.Progress;
 using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
 using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
 using Assets._Project.Develop.Runtime.Utilities.DataManagement;
@@ -45,9 +46,7 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.EntryPoint
 
             yield return container.Resolve<ConfigsProviderService>().LoadAsync();
 
-            // резолвим GameProgressService, чтобы WalletService и GameStatisticsService
-            // успели зарегистрироваться как reader/writer у PlayerDataProvider
-            container.Resolve<GameProgressService>();
+            container.Resolve<ProgressService>();
 
             PlayerDataProvider playerDataProvider = container.Resolve<PlayerDataProvider>();
 

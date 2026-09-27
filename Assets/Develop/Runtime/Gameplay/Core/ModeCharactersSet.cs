@@ -1,8 +1,8 @@
-﻿using Assets.Develop.Runtime.Gameplay.Core;
+using Assets._Project.Develop.Runtime.Meta.Features.GameModes;
 using System;
 using UnityEngine;
 
-namespace Assets.Develop.Runtime.Gameplay.Configs
+namespace Assets._Project.Develop.Runtime.Gameplay.Core
 {
     [Serializable]
     public class ModeCharactersSet

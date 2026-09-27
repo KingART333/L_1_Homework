@@ -1,10 +1,10 @@
-﻿using Assets._Project.Develop.Runtime.Gameplay.Core;
 using Assets._Project.Develop.Runtime.Gameplay.Infrastructure;
 using Assets._Project.Develop.Runtime.Infrastructure;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
+using Assets._Project.Develop.Runtime.Meta.Features.GameModes;
+using Assets._Project.Develop.Runtime.Meta.Features.Progress;
 using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
 using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
-using Assets.Develop.Runtime.Gameplay.Core;
 using System.Collections;
 using UnityEngine;
 
@@ -12,7 +12,13 @@ namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
 {
     public class MainMenuBootstrap : SceneBootstrap
     {
+        public const KeyCode PrintStatusKey = KeyCode.P;
+        public const KeyCode ResetProgressKey = KeyCode.R;
+
         private DIContainer _container;
+        private GameModeSelectorService _modeSelector;
+        private GameModeInputService _modeInput;
+        private ProgressService _progressService;
         private bool _isSwitching;
 
         public override void ProcessRegistrations(DIContainer container, IInputSceneArgs sceneArgs = null)
@@ -26,13 +32,28 @@ namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
         {
             Debug.Log("Initialization gameplay Menu");
 
+            _modeSelector = _container.Resolve<GameModeSelectorService>();
+            _modeInput = _container.Resolve<GameModeInputService>();
+            _progressService = _container.Resolve<ProgressService>();
+
             yield break;
         }
 
         public override void Run()
         {
             Debug.Log("Start gameplay Menu");
-            Debug.Log("Press 1 — Digits, 2 — Letters, P — Statistics, R — Reset progress");
+
+            _modeSelector.SelectionConfirmed += OnModeSelected;
+
+            _modeInput.PrintHintIfChanged();
+
+            Debug.Log($"<{PrintStatusKey}> — statistics | <{ResetProgressKey}> — reset progress");
+        }
+
+        private void OnDestroy()
+        {
+            if (_modeSelector != null)
+                _modeSelector.SelectionConfirmed -= OnModeSelected;
         }
 
         private void Update()
@@ -40,37 +61,35 @@ namespace Assets._Project.Develop.Runtime.Meta.Infrastructure
             if (_isSwitching)
                 return;
 
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-                SwitchToGameplay(GameMode.Digits);
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
-                SwitchToGameplay(GameMode.Letters);
-            else if (Input.GetKeyDown(KeyCode.P))
-                PrintStatus();
-            else if (Input.GetKeyDown(KeyCode.R))
+            if (_modeInput == null || _modeSelector == null || _progressService == null)
+                return;
+
+            _modeInput.Update();
+            _modeInput.PrintHintIfChanged();
+
+            if (Input.GetKeyDown(PrintStatusKey))
+                _progressService.PrintStatus();
+            else if (Input.GetKeyDown(ResetProgressKey))
                 ResetProgress();
         }
 
-        private void SwitchToGameplay(GameMode mode)
+        private void OnModeSelected(GameMode mode)
         {
+            if (_isSwitching)
+                return;
+
             _isSwitching = true;
 
             SceneSwitcherService sceneSwitcherService = _container.Resolve<SceneSwitcherService>();
             ICoroutinesPerformer coroutinesPerformer = _container.Resolve<ICoroutinesPerformer>();
 
-            coroutinesPerformer.StartPerform(sceneSwitcherService.ProcessSwitchTo(Scenes.Gameplay, new GameplayInputArgs(mode)));
-        }
-
-        private void PrintStatus()
-        {
-            GameProgressService progressService = _container.Resolve<GameProgressService>();
-            progressService.PrintStatus();
+            coroutinesPerformer.StartPerform(
+                sceneSwitcherService.ProcessSwitchTo(Scenes.Gameplay, new GameplayInputArgs(mode)));
         }
 
         private void ResetProgress()
         {
-            GameProgressService progressService = _container.Resolve<GameProgressService>();
-
-            if (progressService.TryResetProgress())
+            if (_progressService.TryResetProgress())
                 Debug.Log("Progress reseted");
             else
                 Debug.Log("Insufisent funds for reseting progress");

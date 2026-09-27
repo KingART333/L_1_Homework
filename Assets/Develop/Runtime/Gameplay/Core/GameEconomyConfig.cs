@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Assets._Project.Develop.Runtime.Gameplay.Configs
+namespace Assets._Project.Develop.Runtime.Gameplay.Core
 {
     [CreateAssetMenu(menuName = "Configs/Gameplay/GameEconomyConfig", fileName = "GameEconomyConfig")]
     public class GameEconomyConfig : ScriptableObject

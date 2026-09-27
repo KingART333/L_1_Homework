@@ -1,6 +1,7 @@
-﻿using Assets._Project.Develop.Runtime.Configs.Meta.Wallet;
+using Assets._Project.Develop.Runtime.Configs.Meta.Wallet;
 using Assets._Project.Develop.Runtime.Gameplay.Core;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
+using Assets._Project.Develop.Runtime.Meta.Features.Progress;
 using Assets._Project.Develop.Runtime.Meta.Features.Statistics;
 using Assets._Project.Develop.Runtime.Meta.Features.Wallet;
 using Assets._Project.Develop.Runtime.Utilities.AssetsManagement;
@@ -38,6 +39,7 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.EntryPoint
             container.RegisterAsSingle(CreatePlayerDataProvider);
             container.RegisterAsSingle(CreateWalletService);
             container.RegisterAsSingle(CreateGameStatisticsService);
+            container.RegisterAsSingle(CreateProgressService);
             container.RegisterAsSingle(CreateGameProgressService);
         }
 
@@ -99,10 +101,15 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.EntryPoint
         private static GameStatisticsService CreateGameStatisticsService(DIContainer c) =>
             new GameStatisticsService(c.Resolve<PlayerDataProvider>());
 
-        private static GameProgressService CreateGameProgressService(DIContainer c) =>
-            new GameProgressService(
+        private static ProgressService CreateProgressService(DIContainer c) =>
+            new ProgressService(
                 c.Resolve<ConfigsProviderService>(),
                 c.Resolve<WalletService>(),
+                c.Resolve<GameStatisticsService>());
+
+        private static GameProgressService CreateGameProgressService(DIContainer c) =>
+            new GameProgressService(
+                c.Resolve<ProgressService>(),
                 c.Resolve<GameStatisticsService>(),
                 c.Resolve<PlayerDataProvider>(),
                 c.Resolve<ICoroutinesPerformer>());

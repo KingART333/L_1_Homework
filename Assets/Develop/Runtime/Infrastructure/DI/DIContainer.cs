@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Assets._Project.Develop.Runtime.Infrastructure.DI
@@ -20,7 +20,7 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.DI
 
         public void RegisterAsSingle<T>(Func<DIContainer, T> creator)
         {
-            if (IsAlreadyRegister<T>())
+            if (IsAlreadyRegisterInCurrent<T>())
                 throw new InvalidOperationException($"{typeof(T)} already register");
 
             Registration registration = new Registration(container => creator.Invoke(container));
@@ -29,7 +29,7 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.DI
 
         public bool IsAlreadyRegister<T>()
         {
-            if(_container.ContainsKey(typeof(T)))
+            if(IsAlreadyRegisterInCurrent<T>())
                 return true;
 
             if(_parent != null)
@@ -37,6 +37,8 @@ namespace Assets._Project.Develop.Runtime.Infrastructure.DI
 
             return false;
         }
+
+        private bool IsAlreadyRegisterInCurrent<T>() => _container.ContainsKey(typeof(T));
 
         public T Resolve<T>()
         {

@@ -1,10 +1,9 @@
 namespace Assets._Project.Develop.Runtime.Gameplay.Core
 {
-    public enum GameplayState
+    public enum GameRoundResult
     {
-        Playing,
+        None,
         Win,
-        Lose,
-        Switching
+        Loss
     }
 }

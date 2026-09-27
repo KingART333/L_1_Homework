@@ -1,12 +1,9 @@
-﻿using Assets.Develop.Runtime.Gameplay.Core;
+using Assets._Project.Develop.Runtime.Meta.Features.GameModes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Develop.Runtime.Gameplay.Configs
+namespace Assets._Project.Develop.Runtime.Gameplay.Core
 {
     [CreateAssetMenu(menuName = "Configs/GameplayConfig", fileName = "GameplayConfig")]
     public class GameplayConfig : ScriptableObject
@@ -15,6 +12,19 @@ namespace Assets.Develop.Runtime.Gameplay.Configs
         [SerializeField] private int _sequenceLength;
 
         public int SequenceLength => _sequenceLength;
+
+        public GameMode[] GetAvailableModes()
+        {
+            List<GameMode> modes = new();
+
+            foreach (ModeCharactersSet set in _modeCharactersSets)
+            {
+                if (modes.Contains(set.Mode) == false)
+                    modes.Add(set.Mode);
+            }
+
+            return modes.ToArray();
+        }
 
         public string GetCharactersFor(GameMode mode)
         {

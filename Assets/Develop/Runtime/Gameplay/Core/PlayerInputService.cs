@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 
-namespace Assets.Develop.Runtime.Gameplay.Core
+namespace Assets._Project.Develop.Runtime.Gameplay.Core
 {
     public class PlayerInputService
     {

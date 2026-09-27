@@ -1,26 +1,28 @@
-﻿using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
-using Assets.Develop.Runtime.Gameplay.Configs;
+using Assets._Project.Develop.Runtime.Utilities.ConfigsManagement;
+using Assets._Project.Develop.Runtime.Meta.Features.GameModes;
 using UnityEngine;
 using System.Text;
 
-namespace Assets.Develop.Runtime.Gameplay.Core
+namespace Assets._Project.Develop.Runtime.Gameplay.Core
 {
     public class SequenceGeneratorService
     {
-        private readonly GameplayConfig _config;
-        private readonly GameMode _mode;
+        private readonly ConfigsProviderService _configsProviderService;
 
-        public SequenceGeneratorService(ConfigsProviderService configsProviderService, GameMode mode)
+        public SequenceGeneratorService(ConfigsProviderService configsProviderService)
         {
-            _config = configsProviderService.GetConfig<GameplayConfig>();
-            _mode = mode;
+            _configsProviderService = configsProviderService;
         }
 
-        public string Generate()
+        public string Generate(GameMode mode)
         {
-            string characters = _config.GetCharactersFor(_mode);
-            int length = _config.SequenceLength;
+            GameplayConfig config = _configsProviderService.GetConfig<GameplayConfig>();
 
+            return Generate(config.GetCharactersFor(mode), config.SequenceLength);
+        }
+
+        private string Generate(string characters, int length)
+        {
             StringBuilder builder = new StringBuilder(length);
 
             for (int i = 0; i < length; i++)

@@ -1,7 +1,6 @@
 using Assets._Project.Develop.Runtime.Configs.Meta.Wallet;
-using Assets._Project.Develop.Runtime.Gameplay.Configs;
+using Assets._Project.Develop.Runtime.Gameplay.Core;
 using Assets._Project.Develop.Runtime.Utilities.AssetsManagement;
-using Assets.Develop.Runtime.Gameplay.Configs;
 using System;
 using System.Collections;
 using System.Collections.Generic;

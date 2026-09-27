@@ -1,8 +1,4 @@
-﻿using Assets._Project.Develop.Runtime.Gameplay.Infrastructure;
-using Assets._Project.Develop.Runtime.Infrastructure;
-using Assets._Project.Develop.Runtime.Utilities.CoroutinesManagement;
-using Assets._Project.Develop.Runtime.Utilities.SceneManagement;
-using Assets.Develop.Runtime.Gameplay.Core;
+using Assets._Project.Develop.Runtime.Meta.Features.GameModes;
 using UnityEngine;
 
 namespace Assets._Project.Develop.Runtime.Gameplay.Core
@@ -11,37 +7,39 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Core
     {
         private readonly SequenceGeneratorService _sequenceGenerator;
         private readonly PlayerInputService _playerInput;
-        private readonly SceneSwitcherService _sceneSwitcherService;
-        private readonly ICoroutinesPerformer _coroutinesPerformer;
-        private readonly GameProgressService _progressService;
-        private readonly GameMode _mode;
+        private readonly GameplayOutcomeHandler _outcomeHandler;
+        private readonly GameplayRestartService _restartService;
 
         private SequenceCheckerService _sequenceChecker;
+        private GameMode _mode;
         private GameplayState _state;
+        private GameRoundResult _roundResult;
 
         public GameplayLoopService(
             SequenceGeneratorService sequenceGenerator,
             PlayerInputService playerInput,
-            SceneSwitcherService sceneSwitcherService,
-            ICoroutinesPerformer coroutinesPerformer,
-            GameProgressService progressService,
+            GameplayOutcomeHandler outcomeHandler,
+            GameplayRestartService restartService,
             GameMode mode)
         {
             _sequenceGenerator = sequenceGenerator;
             _playerInput = playerInput;
-            _sceneSwitcherService = sceneSwitcherService;
-            _coroutinesPerformer = coroutinesPerformer;
-            _progressService = progressService;
+            _outcomeHandler = outcomeHandler;
+            _restartService = restartService;
             _mode = mode;
+
+            _outcomeHandler.WinHappened += OnWin;
+            _outcomeHandler.LossHappened += OnLoss;
         }
 
         public void Start()
         {
-            string sequence = _sequenceGenerator.Generate();
+            string sequence = _sequenceGenerator.Generate(_mode);
 
-            Debug.Log($"Sequence: {sequence}");
+            Debug.Log($"Mode: {_mode} | Sequence: {sequence}");
 
             _sequenceChecker = new SequenceCheckerService(sequence);
+            _roundResult = GameRoundResult.None;
             _state = GameplayState.Playing;
         }
 
@@ -54,11 +52,11 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Core
                     break;
 
                 case GameplayState.Win:
-                    UpdateWin();
+                    UpdateEnded();
                     break;
 
                 case GameplayState.Lose:
-                    UpdateLose();
+                    UpdateEnded();
                     break;
 
                 case GameplayState.Switching:
@@ -79,35 +77,41 @@ namespace Assets._Project.Develop.Runtime.Gameplay.Core
                     break;
 
                 case SequenceCheckResult.Failed:
-                    _progressService.RegisterLoss();
-                    Debug.Log("Lose! Press space for restart");
-                    _state = GameplayState.Lose;
+                    _outcomeHandler.Lose();
                     break;
 
                 case SequenceCheckResult.Completed:
-                    _progressService.RegisterWin();
-                    Debug.Log("Win! Press Space for main menu");
-                    _state = GameplayState.Win;
+                    _outcomeHandler.Win();
                     break;
             }
         }
 
-        private void UpdateWin()
+        private void UpdateEnded()
         {
-            if (Input.GetKeyDown(KeyCode.Space) == false)
+            _restartService.Update();
+
+            if (_restartService.CanContinue == false)
                 return;
 
+            _restartService.Continue(_roundResult);
+
             _state = GameplayState.Switching;
-            _coroutinesPerformer.StartPerform(_sceneSwitcherService.ProcessSwitchTo(Scenes.MainMenu));
         }
 
-        private void UpdateLose()
+        private void OnWin()
         {
-            if (Input.GetKeyDown(KeyCode.Space) == false)
-                return;
+            Debug.Log($"Win! Press {GameplayRestartService.ContinueKey} for main menu");
 
-            _state = GameplayState.Switching;
-            _coroutinesPerformer.StartPerform(_sceneSwitcherService.ProcessSwitchTo(Scenes.Gameplay, new GameplayInputArgs(_mode)));
+            _roundResult = GameRoundResult.Win;
+            _state = GameplayState.Win;
+        }
+
+        private void OnLoss()
+        {
+            Debug.Log($"Lose! Press {GameplayRestartService.ContinueKey} for restart");
+
+            _roundResult = GameRoundResult.Loss;
+            _state = GameplayState.Lose;
         }
     }
 }

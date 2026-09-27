@@ -1,4 +1,4 @@
-﻿using Assets._Project.Develop.Runtime.Infrastructure;
+using Assets._Project.Develop.Runtime.Infrastructure;
 using Assets._Project.Develop.Runtime.Infrastructure.DI;
 using Assets._Project.Develop.Runtime.Utilities.LoadingScreen;
 using System.Collections;
@@ -35,7 +35,16 @@ namespace Assets._Project.Develop.Runtime.Utilities.SceneManagement
 
             DIContainer sceneContainer = new DIContainer(_projectContainer);
 
-            sceneBootstrap.ProcessRegistrations(sceneContainer, sceneArgs);
+            try
+            {
+                sceneBootstrap.ProcessRegistrations(sceneContainer, sceneArgs);
+            }
+            catch
+            {
+                Debug.LogError($"{sceneBootstrap.GetType().Name}: registrations failed, scene will not start");
+
+                throw;
+            }
 
             yield return sceneBootstrap.Initialize();
 
